@@ -6,7 +6,7 @@
 
 ## 🚀 Overview
 
-**DocuFlow** is a sleek, glassmorphism-styled document organizer that lets users securely upload, categorize, search, and download their files — all stored on Google Drive with metadata synced in real-time via Firebase.
+**RexDocs** is a sleek, glassmorphism-styled document organizer that lets users securely upload, categorize, search, and download their files — all stored on Google Drive with metadata synced in real-time via Firebase.
 
 The app supports both individual file uploads and full folder uploads, making it ideal for managing large sets of organized documents (e.g., NREGA work reports, legal files, personal records).
 
