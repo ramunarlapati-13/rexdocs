@@ -60,16 +60,21 @@ window.connectGoogleDrive = async function () {
     try {
         const result = await signInWithPopup(auth, provider);
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        sessionStorage.setItem('googleAccessToken', token);
-
-        // Hide button, update state
-        document.getElementById('drive-connect-btn').style.display = 'none';
-        alert("Google Drive Connected Successfully!");
-        updateStorageUsage();
+        const token = credential ? credential.accessToken : null;
+        if (token) {
+            sessionStorage.setItem('googleAccessToken', token);
+            const driveBtn = document.getElementById('drive-connect-btn');
+            if (driveBtn) driveBtn.style.display = 'none';
+            alert("Google Drive Connected Successfully!");
+            updateStorageUsage();
+        }
     } catch (error) {
-        console.error(error);
-        alert("Failed to connect Drive: " + error.message);
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            console.log("Google Drive Sign-In popup closed by user.");
+            return;
+        }
+        console.error("Drive connect error:", error);
+        alert("Failed to connect Drive: " + (error.message || error.code));
     }
 }
 
@@ -511,8 +516,9 @@ function formatBytes(bytes, decimals = 2) {
 
 async function checkDriveConnection() {
     const token = sessionStorage.getItem('googleAccessToken');
+    const driveBtn = document.getElementById('drive-connect-btn');
     if (!token) {
-        document.getElementById('drive-connect-btn').style.display = 'flex';
+        if (driveBtn) driveBtn.style.display = 'flex';
         return;
     }
 
@@ -523,22 +529,19 @@ async function checkDriveConnection() {
             headers: { 'Authorization': 'Bearer ' + token }
         });
 
-        if (response.status === 401) {
-            console.warn("Drive token expired during init check");
+        if (response.status === 401 || response.status === 403) {
+            console.info("Drive token invalid or expired. Prompting user to re-connect.");
             sessionStorage.removeItem('googleAccessToken');
-            document.getElementById('drive-connect-btn').style.display = 'flex';
+            if (driveBtn) driveBtn.style.display = 'flex';
         } else if (response.ok) {
-            document.getElementById('drive-connect-btn').style.display = 'none';
+            if (driveBtn) driveBtn.style.display = 'none';
             updateStorageUsage();
         } else {
-            // Other error (403 etc), maybe keep button visible
-            console.warn("Drive check failed with status", response.status);
-            document.getElementById('drive-connect-btn').style.display = 'flex';
+            if (driveBtn) driveBtn.style.display = 'flex';
         }
     } catch (e) {
-        console.error("Drive check error", e);
-        // On network error, maybe assume valid or show button? Safest to show button.
-        document.getElementById('drive-connect-btn').style.display = 'flex';
+        console.warn("Drive check network error:", e);
+        if (driveBtn) driveBtn.style.display = 'flex';
     }
 }
 
