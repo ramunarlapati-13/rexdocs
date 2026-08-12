@@ -29,10 +29,22 @@ const submitBtn = document.getElementById('submit-btn');
 
 // Redirect if already logged in
 onAuthStateChanged(auth, (user) => {
-    if (user && (sessionStorage.getItem('googleAccessToken') || user.providerData[0].providerId === 'password')) {
+    if (user) {
         window.location.href = 'index.html';
+    } else {
+        hideLoader();
     }
 });
+
+function hideLoader() {
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 350);
+    }
+}
 
 // Email/Password Auth
 authForm.addEventListener('submit', async (e) => {

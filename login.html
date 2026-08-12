@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .login-container {
@@ -24,9 +24,12 @@
         }
 
         .login-card {
-            width: 400px;
+            width: 420px;
             padding: 40px;
             text-align: center;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-lg);
         }
 
         .login-card .logo {
@@ -119,6 +122,15 @@
 </head>
 
 <body>
+    <!-- App Loading Overlay -->
+    <div id="app-loader" class="app-loader">
+        <div class="loader-content">
+            <i class="fa-solid fa-layer-group loader-logo-icon"></i>
+            <div class="loader-spinner"></div>
+            <p>Loading RexDocs...</p>
+        </div>
+    </div>
+
     <div class="login-container">
         <div class="login-card glass-panel">
             <div class="logo">

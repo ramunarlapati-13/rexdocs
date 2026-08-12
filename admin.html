@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> <!-- Reusing existing styles -->
+    <link rel="stylesheet" href="style.css?v=1.0.1"> <!-- Reusing existing styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Admin specific styles overrides */
@@ -73,6 +73,15 @@
 </head>
 
 <body>
+    <!-- App Loading Overlay -->
+    <div id="app-loader" class="app-loader">
+        <div class="loader-content">
+            <i class="fa-solid fa-shield-halved loader-logo-icon"></i>
+            <div class="loader-spinner"></div>
+            <p>Loading Admin Dashboard...</p>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar (Simplified for Admin) -->
         <aside class="sidebar glass-panel">

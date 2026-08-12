@@ -24,6 +24,7 @@ const formattedDisplay = document.getElementById('formatted-display');
 
 // Check authentication first
 onAuthStateChanged(auth, (user) => {
+    hideLoader();
     if (user) {
         startListening();
     } else {
@@ -36,6 +37,16 @@ onAuthStateChanged(auth, (user) => {
         `;
     }
 });
+
+function hideLoader() {
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 350);
+    }
+}
 
 function startListening() {
     const dbRef = ref(db, '/');

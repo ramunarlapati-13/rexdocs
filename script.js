@@ -140,10 +140,21 @@ async function saveUserProfile(user) {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         init(user);
+        hideLoader();
     } else {
         window.location.href = 'login.html';
     }
 });
+
+function hideLoader() {
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 350);
+    }
+}
 
 function updateUserProfile(user) {
     const avatarEl = document.getElementById('user-avatar');

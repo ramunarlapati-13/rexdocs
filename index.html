@@ -8,12 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 
 <body>
+    <!-- App Loading Overlay -->
+    <div id="app-loader" class="app-loader">
+        <div class="loader-content">
+            <i class="fa-solid fa-layer-group loader-logo-icon"></i>
+            <div class="loader-spinner"></div>
+            <p>Loading RexDocs...</p>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar glass-panel">
@@ -24,7 +33,7 @@
 
             <nav class="nav-menu">
                 <button class="nav-item active" data-category="all">
-                    <i class="fa-solid fa-grid-2"></i>
+                    <i class="fa-solid fa-border-all"></i>
                     <span>All Documents</span>
                 </button>
                 <div class="nav-section-title">Categories</div>
@@ -35,34 +44,36 @@
                     <i class="fa-solid fa-plus"></i>
                     <span>New Category</span>
                 </button>
-                <div class="storage-status">
-                    <div class="storage-info">
-                        <i class="fa-solid fa-cloud"></i>
-                        <span>Storage</span>
-                        <span class="storage-percent" id="storage-percent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="storage-fill" style="width: 0%"></div>
-                    </div>
-                    <div class="storage-detail" id="storage-detail">0 Bytes of 5 GB used</div>
-                </div>
+            </nav>
 
-                <div class="user-profile">
-                    <div class="avatar" id="user-avatar">U</div>
-                    <div class="user-info">
-                        <span class="name" id="user-name">User</span>
-                        <span class="role">Member</span>
-                    </div>
-                    <div class="user-actions">
-                        <button class="icon-btn" id="drive-connect-btn" onclick="connectGoogleDrive()"
-                            title="Connect Google Drive" style="display: none; color: #34d399;">
-                            <i class="fa-brands fa-google-drive"></i>
-                        </button>
-                        <button class="icon-btn logout-btn" onclick="logout()" title="Logout">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </button>
-                    </div>
+            <div class="storage-status">
+                <div class="storage-info">
+                    <i class="fa-solid fa-cloud"></i>
+                    <span>Storage</span>
+                    <span class="storage-percent" id="storage-percent">0%</span>
                 </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="storage-fill" style="width: 0%"></div>
+                </div>
+                <div class="storage-detail" id="storage-detail">0 Bytes of 5 GB used</div>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="user-info">
+                    <span class="name" id="user-name">User</span>
+                    <span class="role">Member</span>
+                </div>
+                <div class="user-actions">
+                    <button class="icon-btn" id="drive-connect-btn" onclick="connectGoogleDrive()"
+                        title="Connect Google Drive" style="display: none; color: #34d399;">
+                        <i class="fa-brands fa-google-drive"></i>
+                    </button>
+                    <button class="icon-btn logout-btn" onclick="logout()" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
         </aside>
 
         <!-- Main Content -->
