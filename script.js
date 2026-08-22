@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getDatabase, ref, onValue, push, set, remove, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { hideLoader } from "./utils.js";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -150,16 +151,6 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = 'login.html';
     }
 });
-
-function hideLoader() {
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-        }, 350);
-    }
-}
 
 function updateUserProfile(user) {
     const avatarEl = document.getElementById('user-avatar');

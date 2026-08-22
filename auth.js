@@ -1,6 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { hideLoader } from "./utils.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAPSwKBoQzQc0f4N1VtOs56dB_0haxtOkQ",
@@ -35,16 +36,6 @@ onAuthStateChanged(auth, (user) => {
         hideLoader();
     }
 });
-
-function hideLoader() {
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-        }, 350);
-    }
-}
 
 // Email/Password Auth
 authForm.addEventListener('submit', async (e) => {
