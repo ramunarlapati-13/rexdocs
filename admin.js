@@ -48,6 +48,16 @@ function hideLoader() {
     }
 }
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function startListening() {
     const dbRef = ref(db, '/');
     onValue(dbRef, (snapshot) => {
@@ -56,7 +66,7 @@ function startListening() {
         renderFormattedData(data);
     }, (error) => {
         console.error(error);
-        formattedDisplay.innerHTML = `<p style="color: #ef4444;">Error syncing: ${error.message}</p>`;
+        formattedDisplay.innerHTML = `<p style="color: #ef4444;">Error syncing: ${escapeHtml(error.message)}</p>`;
     });
 }
 
@@ -84,33 +94,45 @@ function renderFormattedData(data) {
         const categories = userData.categories || {};
         const documents = userData.documents || {};
 
-        const userName = profile.displayName || profile.email || "Unknown User";
-        const email = profile.email || "No email provided";
+        const rawUserName = profile.displayName || profile.email || "Unknown User";
+        const rawEmail = profile.email || "No email provided";
+
+        const userName = escapeHtml(rawUserName);
+        const email = escapeHtml(rawEmail);
+        const escapedUid = escapeHtml(uid);
 
         const docList = Object.entries(documents).map(([docId, doc]) => {
             const category = categories[doc.categoryId] || { name: 'Uncategorized', color: '#999' };
+            const docName = escapeHtml(doc.name || '');
+            const categoryName = escapeHtml(category.name || 'Uncategorized');
+            const categoryColor = escapeHtml(category.color || '#999');
+            const docSize = escapeHtml(doc.size || '0 KB');
+            const docDate = escapeHtml(doc.date ? new Date(doc.date).toLocaleDateString() : '');
+
             return `
                 <tr>
                     <td><i class="fa-solid fa-file-lines" style="color: var(--text-muted);"></i></td>
-                    <td><strong>${doc.name}</strong></td>
+                    <td><strong>${docName}</strong></td>
                     <td>
-                        <span class="badge" style="background: ${category.color}20; color: ${category.color}">
-                            ${category.name}
+                        <span class="badge" style="background: ${categoryColor}20; color: ${categoryColor}">
+                            ${categoryName}
                         </span>
                     </td>
-                    <td>${doc.size || '0 KB'}</td>
-                    <td>${new Date(doc.date).toLocaleDateString()}</td>
+                    <td>${docSize}</td>
+                    <td>${docDate}</td>
                 </tr>
             `;
         }).join('');
 
+        const avatarChar = escapeHtml(rawUserName[0] ? rawUserName[0].toUpperCase() : '?');
+
         return `
             <div class="user-data-card">
                 <div class="user-header">
-                    <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">${userName[0].toUpperCase()}</div>
+                    <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">${avatarChar}</div>
                     <div>
                         <h4 style="margin-bottom: 2px;">${userName}</h4>
-                        <p style="font-size: 12px; color: var(--text-muted);">${email} • UID: ${uid.substring(0, 8)}...</p>
+                        <p style="font-size: 12px; color: var(--text-muted);">${email} • UID: ${escapedUid.substring(0, 8)}...</p>
                     </div>
                 </div>
                 
