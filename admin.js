@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { hideLoader } from "./utils.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAPSwKBoQzQc0f4N1VtOs56dB_0haxtOkQ",
@@ -37,16 +38,6 @@ onAuthStateChanged(auth, (user) => {
         `;
     }
 });
-
-function hideLoader() {
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-        }, 350);
-    }
-}
 
 function startListening() {
     const dbRef = ref(db, '/');
