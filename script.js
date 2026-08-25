@@ -7,7 +7,7 @@ import { hideLoader } from "./utils.js";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
-    apiKey: "AIzaSyAPSwKBoQzQc0f4N1VtOs56dB_0haxtOkQ",
+    apiKey: (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) || window.FIREBASE_API_KEY || "YOUR_API_KEY",
     authDomain: "nrega-media.firebaseapp.com",
     projectId: "nrega-media",
     storageBucket: "nrega-media.firebasestorage.app",
