@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getDatabase, ref, onValue, push, set, remove, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { hideLoader } from "./utils.js";
+import { hideLoader, escapeHtml } from "./utils.js";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -204,26 +204,31 @@ async function setupRealtimeListeners(user) {
 function renderCategories() {
     if (!categoryList) return;
 
-    categoryList.innerHTML = categories.map(cat => `
+    categoryList.innerHTML = categories.map(cat => {
+        const safeId = escapeHtml(cat.id);
+        const safeName = escapeHtml(cat.name);
+        const safeColor = escapeHtml(cat.color);
+        return `
         <div class="nav-group ${currentCategory === cat.id ? 'active' : ''}">
-            <button class="nav-item-content" onclick="filterCategory('${cat.id}')">
-                <i class="fa-solid fa-folder" style="color: ${cat.color}"></i>
-                <span>${cat.name}</span>
+            <button class="nav-item-content" onclick="filterCategory('${safeId}')">
+                <i class="fa-solid fa-folder" style="color: ${safeColor}"></i>
+                <span>${safeName}</span>
             </button>
-            <button class="nav-item-action" onclick="openEditCategoryModal('${cat.id}', '${cat.name}', '${cat.color}')" title="Edit Category">
+            <button class="nav-item-action" onclick="openEditCategoryModal('${safeId}')" title="Edit Category">
                 <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="nav-item-action delete" onclick="deleteCategory('${cat.id}', event)" title="Delete Category">
+            <button class="nav-item-action delete" onclick="deleteCategory('${safeId}', event)" title="Delete Category">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
-    `).join('');
+    `;
+    }).join('');
 
     // Also update selector in upload modal
     const docCategorySelect = document.getElementById('doc-category');
     if (docCategorySelect) {
         docCategorySelect.innerHTML = categories.map(cat =>
-            `<option value="${cat.id}">${cat.name}</option>`
+            `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`
         ).join('');
     }
 }
@@ -256,20 +261,27 @@ function renderDocuments() {
         if (emptyState) emptyState.classList.add('hidden');
         docGrid.innerHTML = filteredDocs.map(doc => {
             const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
+            const safeDocId = escapeHtml(doc.id);
+            const safeDocName = escapeHtml(doc.name);
+            const safeDocSize = escapeHtml(doc.size || '0 KB');
+            const safeDocDate = escapeHtml(formatDate(doc.date));
+            const safeCatName = escapeHtml(category.name);
+            const safeCatColor = escapeHtml(category.color);
+            const safeIcon = escapeHtml(getFileIcon(doc.type || 'file'));
             return `
-                <div class="document-card" onclick="openDoc('${doc.id}')">
+                <div class="document-card" onclick="openDoc('${safeDocId}')">
                     <div class="card-icon">
-                        <i class="fa-solid ${getFileIcon(doc.type || 'file')}"></i>
+                        <i class="fa-solid ${safeIcon}"></i>
                     </div>
                     <div class="card-info">
-                        <h3>${doc.name}</h3>
-                        <p>${formatDate(doc.date)} • ${doc.size || '0 KB'}</p>
+                        <h3>${safeDocName}</h3>
+                        <p>${safeDocDate} • ${safeDocSize}</p>
                     </div>
                     <div class="card-meta">
-                        <span class="tag-badge" style="background: ${category.color}20; color: ${category.color}">
-                            ${category.name}
+                        <span class="tag-badge" style="background: ${safeCatColor}20; color: ${safeCatColor}">
+                            ${safeCatName}
                         </span>
-                        <button class="doc-menu-btn" onclick="deleteDoc('${doc.id}', event)">
+                        <button class="doc-menu-btn" onclick="deleteDoc('${safeDocId}', event)">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -681,11 +693,14 @@ function updatePreviewForFolder(name, count) {
     previewContainer.classList.remove('hidden');
     dropZone.classList.add('hidden');
 
+    const safeName = escapeHtml(name);
+    const safeCount = escapeHtml(count);
+
     previewContainer.innerHTML = `
         <div class="preview-thumb"><i class="fa-solid fa-folder-open"></i></div>
         <div class="file-meta-info">
-            <div class="file-name">${name}</div>
-            <div class="file-details">${count} files found</div>
+            <div class="file-name">${safeName}</div>
+            <div class="file-details">${safeCount} files found</div>
         </div>
         <button class="icon-btn" onclick="resetFileSelection()" title="Remove"><i class="fa-solid fa-xmark"></i></button>
     `;
@@ -716,6 +731,11 @@ function handleSingleFile(file) {
     };
     fullReader.readAsDataURL(file);
 
+    const safeFileName = escapeHtml(file.name);
+    const safeFormat = escapeHtml(format);
+    const safeSize = escapeHtml(size);
+    const safeIcon = escapeHtml(getFileIcon(file.type));
+
     let previewContent = '';
     if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -730,7 +750,7 @@ function handleSingleFile(file) {
         thumbnailData = null;
         previewContent = `
             <div class="preview-thumb">
-                <i class="fa-solid ${getFileIcon(file.type)}"></i>
+                <i class="fa-solid ${safeIcon}"></i>
             </div>
         `;
     }
@@ -738,8 +758,8 @@ function handleSingleFile(file) {
     previewContainer.innerHTML = `
         ${previewContent}
         <div class="file-meta-info">
-            <div class="file-name">${file.name} <span class="badge-format">${format}</span></div>
-            <div class="file-details">${size} • Analyzed Format</div>
+            <div class="file-name">${safeFileName} <span class="badge-format">${safeFormat}</span></div>
+            <div class="file-details">${safeSize} • Analyzed Format</div>
         </div>
         <button class="icon-btn" onclick="resetFileSelection()" title="Remove file"><i class="fa-solid fa-xmark"></i></button>
     `;
@@ -805,11 +825,15 @@ window.saveCategory = async function () {
 
 window.openEditCategoryModal = function (id, name, color) {
     editingCategoryId = id;
+    const category = categories.find(c => c.id === id);
+    const catName = category ? category.name : (name || '');
+    const catColor = category ? category.color : (color || '#6366f1');
+
     const nameInput = document.getElementById('cat-name');
     const modalTitle = document.querySelector('#category-modal .modal-header h2');
     const submitBtn = document.querySelector('#category-modal .primary-btn');
 
-    if (nameInput) nameInput.value = name;
+    if (nameInput) nameInput.value = catName;
     if (modalTitle) modalTitle.innerText = "Edit Category";
     if (submitBtn) submitBtn.innerText = "Update";
 
@@ -817,7 +841,7 @@ window.openEditCategoryModal = function (id, name, color) {
     const colorOptions = document.querySelectorAll('.color-option');
     colorOptions.forEach(o => {
         o.classList.remove('selected');
-        if (o.dataset.color === color) o.classList.add('selected');
+        if (o.dataset.color === catColor) o.classList.add('selected');
     });
 
     window.openCategoryModal();
@@ -841,11 +865,15 @@ window.openDoc = function (id) {
 
     const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
 
+    const safeCatName = escapeHtml(category.name);
+    const safeCatColor = escapeHtml(category.color);
+    const safeIcon = escapeHtml(getFileIcon(doc.type));
+
     // Set UI elements
     document.getElementById('view-name').innerText = doc.name;
     document.getElementById('view-category').innerHTML = `
-        <span class="badge" style="background: ${category.color}20; color: ${category.color}">
-            ${category.name}
+        <span class="badge" style="background: ${safeCatColor}20; color: ${safeCatColor}">
+            ${safeCatName}
         </span>
     `;
     document.getElementById('view-format').innerText = doc.type.split('/').pop().toUpperCase();
@@ -857,7 +885,7 @@ window.openDoc = function (id) {
     if (doc.thumbnail) {
         visualContainer.innerHTML = `<img src="${doc.thumbnail}" alt="Preview" style="max-height: 100%; border-radius: 20px;">`;
     } else {
-        visualContainer.innerHTML = `<i class="fa-solid ${getFileIcon(doc.type)}"></i>`;
+        visualContainer.innerHTML = `<i class="fa-solid ${safeIcon}"></i>`;
     }
 
     window.openPreviewModal();
