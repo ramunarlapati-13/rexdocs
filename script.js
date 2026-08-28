@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getDatabase, ref, onValue, push, set, remove, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { hideLoader } from "./utils.js";
+import { hideLoader, escapeHtml } from "./utils.js";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -204,26 +204,31 @@ async function setupRealtimeListeners(user) {
 function renderCategories() {
     if (!categoryList) return;
 
-    categoryList.innerHTML = categories.map(cat => `
-        <div class="nav-group ${currentCategory === cat.id ? 'active' : ''}">
-            <button class="nav-item-content" onclick="filterCategory('${cat.id}')">
-                <i class="fa-solid fa-folder" style="color: ${cat.color}"></i>
-                <span>${cat.name}</span>
+    categoryList.innerHTML = categories.map(cat => {
+        const safeId = escapeHtml(cat.id);
+        const safeName = escapeHtml(cat.name);
+        const safeColor = escapeHtml(cat.color);
+        return `
+        <div class="nav-group ${currentCategory === cat.id ? 'active' : ''}" data-id="${safeId}" data-name="${safeName}" data-color="${safeColor}">
+            <button class="nav-item-content" data-action="filter">
+                <i class="fa-solid fa-folder" style="color: ${safeColor}"></i>
+                <span>${safeName}</span>
             </button>
-            <button class="nav-item-action" onclick="openEditCategoryModal('${cat.id}', '${cat.name}', '${cat.color}')" title="Edit Category">
+            <button class="nav-item-action" data-action="edit" title="Edit Category">
                 <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="nav-item-action delete" onclick="deleteCategory('${cat.id}', event)" title="Delete Category">
+            <button class="nav-item-action delete" data-action="delete" title="Delete Category">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
-    `).join('');
+    `;
+    }).join('');
 
     // Also update selector in upload modal
     const docCategorySelect = document.getElementById('doc-category');
     if (docCategorySelect) {
         docCategorySelect.innerHTML = categories.map(cat =>
-            `<option value="${cat.id}">${cat.name}</option>`
+            `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`
         ).join('');
     }
 }
@@ -1035,6 +1040,30 @@ function setupEventListeners() {
         folderInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFileSelect(e.target.files);
+            }
+        });
+    }
+
+    // Category List Event Delegation
+    if (categoryList) {
+        categoryList.addEventListener('click', (e) => {
+            const actionBtn = e.target.closest('[data-action]');
+            if (!actionBtn) return;
+
+            const groupEl = actionBtn.closest('.nav-group');
+            if (!groupEl) return;
+
+            const id = groupEl.dataset.id;
+            const name = groupEl.dataset.name;
+            const color = groupEl.dataset.color;
+            const action = actionBtn.dataset.action;
+
+            if (action === 'filter') {
+                window.filterCategory(id);
+            } else if (action === 'edit') {
+                window.openEditCategoryModal(id, name, color);
+            } else if (action === 'delete') {
+                window.deleteCategory(id, e);
             }
         });
     }
