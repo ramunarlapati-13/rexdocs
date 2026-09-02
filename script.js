@@ -259,8 +259,10 @@ function renderDocuments() {
         if (emptyState) emptyState.classList.remove('hidden');
     } else {
         if (emptyState) emptyState.classList.add('hidden');
+        const categoryMap = new Map(categories.map(c => [c.id, c]));
+        const defaultCategory = { name: 'Uncategorized', color: '#ccc' };
         docGrid.innerHTML = filteredDocs.map(doc => {
-            const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
+            const category = categoryMap.get(doc.categoryId) || defaultCategory;
             return `
                 <div class="document-card" onclick="openDoc('${doc.id}')">
                     <div class="card-icon">
