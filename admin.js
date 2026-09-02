@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { hideLoader } from "./utils.js";
+import { hideLoader, escapeHtml } from "./utils.js";
 
 const firebaseConfig = {
     apiKey: (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) || window.FIREBASE_API_KEY || "YOUR_API_KEY",
@@ -47,7 +47,7 @@ function startListening() {
         renderFormattedData(data);
     }, (error) => {
         console.error(error);
-        formattedDisplay.innerHTML = `<p style="color: #ef4444;">Error syncing: ${error.message}</p>`;
+        formattedDisplay.innerHTML = `<p style="color: #ef4444;">Error syncing: ${escapeHtml(error.message)}</p>`;
     });
 }
 
@@ -78,19 +78,28 @@ function renderFormattedData(data) {
         const userName = profile.displayName || profile.email || "Unknown User";
         const email = profile.email || "No email provided";
 
+        const safeUserName = escapeHtml(userName);
+        const safeEmail = escapeHtml(email);
+        const safeUid = escapeHtml(uid.substring(0, 8));
+
         const docList = Object.entries(documents).map(([docId, doc]) => {
             const category = categories[doc.categoryId] || { name: 'Uncategorized', color: '#999' };
+            const safeDocName = escapeHtml(doc.name);
+            const safeCategoryName = escapeHtml(category.name);
+            const safeCategoryColor = escapeHtml(category.color);
+            const safeSize = escapeHtml(doc.size || '0 KB');
+            const safeDate = escapeHtml(new Date(doc.date).toLocaleDateString());
             return `
                 <tr>
                     <td><i class="fa-solid fa-file-lines" style="color: var(--text-muted);"></i></td>
-                    <td><strong>${doc.name}</strong></td>
+                    <td><strong>${safeDocName}</strong></td>
                     <td>
-                        <span class="badge" style="background: ${category.color}20; color: ${category.color}">
-                            ${category.name}
+                        <span class="badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
+                            ${safeCategoryName}
                         </span>
                     </td>
-                    <td>${doc.size || '0 KB'}</td>
-                    <td>${new Date(doc.date).toLocaleDateString()}</td>
+                    <td>${safeSize}</td>
+                    <td>${safeDate}</td>
                 </tr>
             `;
         }).join('');
@@ -98,10 +107,10 @@ function renderFormattedData(data) {
         return `
             <div class="user-data-card">
                 <div class="user-header">
-                    <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">${userName[0].toUpperCase()}</div>
+                    <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">${safeUserName[0] ? safeUserName[0].toUpperCase() : 'U'}</div>
                     <div>
-                        <h4 style="margin-bottom: 2px;">${userName}</h4>
-                        <p style="font-size: 12px; color: var(--text-muted);">${email} • UID: ${uid.substring(0, 8)}...</p>
+                        <h4 style="margin-bottom: 2px;">${safeUserName}</h4>
+                        <p style="font-size: 12px; color: var(--text-muted);">${safeEmail} • UID: ${safeUid}...</p>
                     </div>
                 </div>
                 
