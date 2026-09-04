@@ -261,20 +261,25 @@ function renderDocuments() {
         if (emptyState) emptyState.classList.add('hidden');
         docGrid.innerHTML = filteredDocs.map(doc => {
             const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
+            const safeDocId = escapeHtml(doc.id);
+            const safeDocName = escapeHtml(doc.name);
+            const safeDocSize = escapeHtml(doc.size || '0 KB');
+            const safeCategoryName = escapeHtml(category.name);
+            const safeCategoryColor = escapeHtml(category.color);
             return `
-                <div class="document-card" onclick="openDoc('${doc.id}')">
+                <div class="document-card" onclick="openDoc('${safeDocId}')">
                     <div class="card-icon">
                         <i class="fa-solid ${getFileIcon(doc.type || 'file')}"></i>
                     </div>
                     <div class="card-info">
-                        <h3>${doc.name}</h3>
-                        <p>${formatDate(doc.date)} • ${doc.size || '0 KB'}</p>
+                        <h3>${safeDocName}</h3>
+                        <p>${escapeHtml(formatDate(doc.date))} • ${safeDocSize}</p>
                     </div>
                     <div class="card-meta">
-                        <span class="tag-badge" style="background: ${category.color}20; color: ${category.color}">
-                            ${category.name}
+                        <span class="tag-badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
+                            ${safeCategoryName}
                         </span>
-                        <button class="doc-menu-btn" onclick="deleteDoc('${doc.id}', event)">
+                        <button class="doc-menu-btn" onclick="deleteDoc('${safeDocId}', event)">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -689,8 +694,8 @@ function updatePreviewForFolder(name, count) {
     previewContainer.innerHTML = `
         <div class="preview-thumb"><i class="fa-solid fa-folder-open"></i></div>
         <div class="file-meta-info">
-            <div class="file-name">${name}</div>
-            <div class="file-details">${count} files found</div>
+            <div class="file-name">${escapeHtml(name)}</div>
+            <div class="file-details">${escapeHtml(count)} files found</div>
         </div>
         <button class="icon-btn" onclick="resetFileSelection()" title="Remove"><i class="fa-solid fa-xmark"></i></button>
     `;
@@ -743,8 +748,8 @@ function handleSingleFile(file) {
     previewContainer.innerHTML = `
         ${previewContent}
         <div class="file-meta-info">
-            <div class="file-name">${file.name} <span class="badge-format">${format}</span></div>
-            <div class="file-details">${size} • Analyzed Format</div>
+            <div class="file-name">${escapeHtml(file.name)} <span class="badge-format">${escapeHtml(format)}</span></div>
+            <div class="file-details">${escapeHtml(size)} • Analyzed Format</div>
         </div>
         <button class="icon-btn" onclick="resetFileSelection()" title="Remove file"><i class="fa-solid fa-xmark"></i></button>
     `;
@@ -846,11 +851,14 @@ window.openDoc = function (id) {
 
     const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
 
+    const safeCategoryColor = escapeHtml(category.color);
+    const safeCategoryName = escapeHtml(category.name);
+
     // Set UI elements
     document.getElementById('view-name').innerText = doc.name;
     document.getElementById('view-category').innerHTML = `
-        <span class="badge" style="background: ${category.color}20; color: ${category.color}">
-            ${category.name}
+        <span class="badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
+            ${safeCategoryName}
         </span>
     `;
     document.getElementById('view-format').innerText = doc.type.split('/').pop().toUpperCase();
