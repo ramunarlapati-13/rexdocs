@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { hideLoader, escapeHtml } from "./utils.js";
+import { hideLoader, escapeHtml, renderCategoryBadge } from "./utils.js";
 
 const firebaseConfig = {
     apiKey: (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) || window.FIREBASE_API_KEY || "YOUR_API_KEY",
@@ -85,19 +85,13 @@ function renderFormattedData(data) {
         const docList = Object.entries(documents).map(([docId, doc]) => {
             const category = categories[doc.categoryId] || { name: 'Uncategorized', color: '#999' };
             const safeDocName = escapeHtml(doc.name);
-            const safeCategoryName = escapeHtml(category.name);
-            const safeCategoryColor = escapeHtml(category.color);
             const safeSize = escapeHtml(doc.size || '0 KB');
             const safeDate = escapeHtml(new Date(doc.date).toLocaleDateString());
             return `
                 <tr>
                     <td><i class="fa-solid fa-file-lines" style="color: var(--text-muted);"></i></td>
                     <td><strong>${safeDocName}</strong></td>
-                    <td>
-                        <span class="badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
-                            ${safeCategoryName}
-                        </span>
-                    </td>
+                    <td>${renderCategoryBadge(category.name, category.color, 'badge')}</td>
                     <td>${safeSize}</td>
                     <td>${safeDate}</td>
                 </tr>
