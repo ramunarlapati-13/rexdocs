@@ -868,9 +868,9 @@ window.openDoc = function (id) {
     // Set Visual
     const visualContainer = document.getElementById('preview-visual');
     if (doc.thumbnail) {
-        visualContainer.innerHTML = `<img src="${doc.thumbnail}" alt="Preview" style="max-height: 100%; border-radius: 20px;">`;
+        visualContainer.innerHTML = `<img src="${escapeHtml(doc.thumbnail)}" alt="Preview" style="max-height: 100%; border-radius: 20px;">`;
     } else {
-        visualContainer.innerHTML = `<i class="fa-solid ${getFileIcon(doc.type)}"></i>`;
+        visualContainer.innerHTML = `<i class="fa-solid ${escapeHtml(getFileIcon(doc.type))}"></i>`;
     }
 
     window.openPreviewModal();

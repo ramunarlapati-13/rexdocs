@@ -34,6 +34,16 @@ const testCases = [
         input: 12345,
         expected: '12345',
         desc: 'Numeric input'
+    },
+    {
+        input: 'https://example.com/image.png" onload="alert(1)"',
+        expected: 'https://example.com/image.png&quot; onload=&quot;alert(1)&quot;',
+        desc: 'Thumbnail payload escaping'
+    },
+    {
+        input: 'fa-file" onerror="alert(1)"',
+        expected: 'fa-file&quot; onerror=&quot;alert(1)&quot;',
+        desc: 'Icon class payload escaping'
     }
 ];
 
