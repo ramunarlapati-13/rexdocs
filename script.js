@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getDatabase, ref, onValue, push, set, remove, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { hideLoader, escapeHtml } from "./utils.js";
+import { hideLoader, escapeHtml, renderCategoryBadge } from "./utils.js";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -264,8 +264,6 @@ function renderDocuments() {
             const safeDocId = escapeHtml(doc.id);
             const safeDocName = escapeHtml(doc.name);
             const safeDocSize = escapeHtml(doc.size || '0 KB');
-            const safeCategoryName = escapeHtml(category.name);
-            const safeCategoryColor = escapeHtml(category.color);
             return `
                 <div class="document-card" onclick="openDoc('${safeDocId}')">
                     <div class="card-icon">
@@ -276,9 +274,7 @@ function renderDocuments() {
                         <p>${escapeHtml(formatDate(doc.date))} • ${safeDocSize}</p>
                     </div>
                     <div class="card-meta">
-                        <span class="tag-badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
-                            ${safeCategoryName}
-                        </span>
+                        ${renderCategoryBadge(category.name, category.color, 'tag-badge')}
                         <button class="doc-menu-btn" onclick="deleteDoc('${safeDocId}', event)">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -851,16 +847,9 @@ window.openDoc = function (id) {
 
     const category = categories.find(c => c.id === doc.categoryId) || { name: 'Uncategorized', color: '#ccc' };
 
-    const safeCategoryColor = escapeHtml(category.color);
-    const safeCategoryName = escapeHtml(category.name);
-
     // Set UI elements
     document.getElementById('view-name').innerText = doc.name;
-    document.getElementById('view-category').innerHTML = `
-        <span class="badge" style="background: ${safeCategoryColor}20; color: ${safeCategoryColor}">
-            ${safeCategoryName}
-        </span>
-    `;
+    document.getElementById('view-category').innerHTML = renderCategoryBadge(category.name, category.color, 'badge');
     document.getElementById('view-format').innerText = doc.type.split('/').pop().toUpperCase();
     document.getElementById('view-size').innerText = doc.size;
     document.getElementById('view-date').innerText = formatDate(doc.date);
