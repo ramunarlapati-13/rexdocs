@@ -31,7 +31,6 @@ let editingCategoryId = null;
 let selectedFile = null;
 let selectedFiles = []; // For folder upload
 let thumbnailData = null;
-let fullFileContent = null;
 let uploadMode = 'file'; // 'file' or 'folder'
 
 // DOM Elements
@@ -447,7 +446,6 @@ window.saveDocument = async function () {
         window.closeUploadModal();
         zipBtn.innerText = originalBtnText;
         thumbnailData = null;
-        fullFileContent = null;
         // updateStorageUsage(); // Handled automatically by listener
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -714,13 +712,6 @@ function handleSingleFile(file) {
     // Show Preview UI
     previewContainer.classList.remove('hidden');
     dropZone.classList.add('hidden'); // Hide dropzone while previewing
-
-    // Generate Full File Data for Download
-    const fullReader = new FileReader();
-    fullReader.onload = (e) => {
-        fullFileContent = e.target.result; // Base64 full file
-    };
-    fullReader.readAsDataURL(file);
 
     let previewContent = '';
     if (file.type.startsWith('image/')) {
